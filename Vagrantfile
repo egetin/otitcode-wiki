@@ -68,4 +68,16 @@ Vagrant.configure(2) do |config|
   #   sudo apt-get update
   #   sudo apt-get install -y apache2
   # SHELL
+  
+  # Salt provisioning
+  config.vm.synced_folder "salt/", "/srv/salt/"
+  config.vm.provision :salt do |salt|
+    salt.masterless = true
+    salt.minion_config = "salt/minion"
+    salt.run_highstate = true
+
+    # Debug
+    #salt.verbose = true
+    #salt.log_level = "info"
+  end
 end

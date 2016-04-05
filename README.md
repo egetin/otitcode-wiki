@@ -5,13 +5,15 @@
  - Henri Koski
  - Mikko Korhonen
 
-## Requirements
-Activate PostgreSQL repository in vagrant:
-http://www.postgresql.org/download/linux/ubuntu/
+## Development requirements & installation
+### Requirements
+- vagrant
+- virtualbox
 
-In vagrant, install following packages:
- - python-dev
- - postgresql-9.5
- - postgresql-server-dev-9.5
+### Installation
+Run 'vagrant up' and wait a while. Then 'vagrant ssh'.
+Go to /vagrant/ and activate virtualenv.
+Then create superuser by running pwp/manage.py createsuperuser
 
-Also create a user called 'devuser' with database 'wiki_development'.
+### Usage
+With virtualenv in /vagrant activated, run /vagrant/pwp/manage.py runserver 0.0.0.0:8000
