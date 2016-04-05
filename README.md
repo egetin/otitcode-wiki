@@ -1,6 +1,6 @@
-= #otit.code rule wiki =
+# #otit.code rule wiki
 
-== Developers ==
+## Developers
  - Erkka Makinen
  - Henri Koski
  - Mikko Korhonen
