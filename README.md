@@ -1,4 +1,4 @@
-# #otit.code rule wiki
+# #otit.code rule wiki backend
 
 ## Developers
  - Erkka Makinen
