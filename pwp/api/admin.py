@@ -1,5 +1,7 @@
 from django.contrib import admin
 
-from .models import Rule
+from .models import Article, Comment, User
 
-admin.site.register(Rule)
+admin.site.register(Article)
+admin.site.register(Comment)
+admin.site.register(User)
