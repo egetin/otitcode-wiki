@@ -133,6 +133,7 @@ def CurrentUserHandler(request):
     if request.method == 'GET':
         if request.user is not None:
             user_dict = to_dict(request.user)
+            user_dict.pop("password", None)
             return JsonResponse(user_dict)
         else:
             return JsonResponse({"error": "User not logged in"}, status=404)
