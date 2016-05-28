@@ -108,3 +108,46 @@ def ArticleHandler(request, article_id=None):
         else:
             return JsonResponse({"error": "Permission denied"}, status=401)
 
+@require_http_methods(["GET", "PUT", "POST", "DELETE"])
+def UserHandler(request, user_id=None):
+    pass
+
+@require_http_methods(["GET", "POST"])
+def CommentHandler(request, comment_id=None):
+    if request.method == "GET" and comment_id is None:
+        comments = Comment.objects.all()
+        data = []
+
+        for comment in comments:
+            comment_dict = to_dict(comment)
+            data.append(article_dict)
+
+        return JsonResponse(data, safe=False)
+
+    if request.method == "GET" and comment_id is not None:
+        try:
+            comment = Comment.objects.get(pk=comment_id)
+        except Comment.DoesNotExist:
+            return JsonResponse({"error": "Comment does not exist"}, status=404)
+
+        comment_dict = to_dict(comment)
+        return JsonResponse(comment_dict, status=200)
+
+    if request.method == "POST":
+        # Create comment
+        user = request.user
+        if user is None:
+            return JsonResponse({"error": "User not authenticated"}, status=401)
+
+        body = parseJSON(request.body)
+        try:
+            serialized_data = serialize_json(body, 'api.Comment')
+        except (ValueError, KeyError):
+            return JsonResponse({'error': 'JSON is invalid'}, status=409)
+
+        new_comment = serializers.deserialize('json', serialized_data).next().object
+        new_comment.owner = request.user
+
+        new_comment.save()
+
+        return JsonResponse(to_dict(new_comment))

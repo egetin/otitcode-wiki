@@ -6,4 +6,13 @@ urlpatterns = [
     url(r'^auth$', views.AuthHandler, name='auth'),
     url(r'^articles$', views.ArticleHandler, name='articles'),
     url(r'^articles/(?P<article_id>\d+)$', views.ArticleHandler, name='article'),
+    url(r'^comments$', views.CommentHandler, name='comments'),
+    url(r'^comments/(?P<comment_id>\d+)$', views.CommentHandler, name='comments'),
+    #url(r'^articles/(?P<article_id>\d+)/comments$')
+    #users
+    #users id
+# users id comments
+# users id articles
+# comments
+# comments id
 ]
