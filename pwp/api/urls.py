@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^users/(?P<user_id>\d+)$', views.UserHandler, name='user'),
     url(r'^users/(?P<user_id>\d+)/articles$', views.UserArticleHandler, name='userarticle'),
     url(r'^users/(?P<user_id>\d+)/comments$', views.UserCommentHandler, name='usercomment'),
+    url(r'^users/me$', views.CurrentUserHandler, name='currentuser'),
 ]

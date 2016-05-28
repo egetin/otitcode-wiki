@@ -110,6 +110,34 @@ def ArticleHandler(request, article_id=None):
         else:
             return JsonResponse({"error": "Permission denied"}, status=401)
 
+
+@require_http_methods(["PUT"])
+def PasswordHandler(request):
+    body = parseJSON(request.body)
+    try:
+        password = body["password"]
+    except (ValueError, KeyError):
+        return JsonResponse({'error': 'JSON is invalid'}, status=409)
+
+    user = request.user
+    user.set_password(password)
+    user.save()
+
+    token = Token.objects.create(user=user)
+    response = HttpResponse(jsonresponse)
+    response["Authorization"] = token
+
+
+@require_http_methods(["GET", "PUT", "DELETE"])
+def CurrentUserHandler(request):
+    if request.method == 'GET':
+        if request.user is not None:
+            user_dict = to_dict(request.user)
+            return JsonResponse(user_dict)
+        else:
+            return JsonResponse({"error": "User not logged in"}, status=404)
+
+
 @require_http_methods(["GET", "PUT", "POST", "DELETE"])
 def UserHandler(request, user_id=None):
     if request.method == 'GET' and user_id is None:
@@ -160,6 +188,8 @@ def UserHandler(request, user_id=None):
         response["Authorization"] = token
 
         return response
+
+
 
 @require_http_methods(["GET"])
 def CommentHandler(request, comment_id=None):

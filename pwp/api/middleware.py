@@ -12,3 +12,6 @@ class AuthTokenMiddleware(object):
                 request.user = None
                 request.auth = None
                 pass
+        else:
+            request.user = None
+            request.auth = None
