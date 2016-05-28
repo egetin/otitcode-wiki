@@ -3,6 +3,7 @@
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import AnonymousUser
 from django.views.decorators.http import require_http_methods
 from django.forms.models import model_to_dict
 from rest_framework.authtoken.models import Token
@@ -36,6 +37,9 @@ def index(request):
 
 @require_http_methods(["GET"])
 def ArticlesHandler(request):
+    user = request.user
+    print user
+
     articles = Article.objects.all()
     data = []
 
@@ -51,7 +55,9 @@ def ArticleHandler(request):
         # Create article
         user = request.user
         print user
-        print request.META
+        if user is None:
+            return JsonResponse({"error": "User not authenticated"}, status=401)
+
         body = parseJSON(request.body)
         try:
             serialized_data = serialize_json(body, 'api.Article')
@@ -64,3 +70,4 @@ def ArticleHandler(request):
         new_article.save()
 
         return JsonResponse(model_to_dict(new_article))
+
