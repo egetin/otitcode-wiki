@@ -12,3 +12,7 @@ class AuthTokenMiddleware(object):
                 request.user = None
                 request.auth = None
                 pass
+        else:
+            if '/admin' not in request.path:
+                request.user = None
+                request.auth = None
