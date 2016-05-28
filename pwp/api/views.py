@@ -55,6 +55,28 @@ def ArticleHandler(request, article_id=None):
         article_dict = to_dict(article)
         return JsonResponse(article_dict, status=200)
 
+    if request.method == "PUT" and article_id is not None:
+        try:
+            article = Article.objects.get(pk=article_id)
+        except Article.DoesNotExist:
+            return JsonResponse({"error": "Article does not exist"}, status=404)
+
+        if article.owner != request.user:
+            return JsonResponse({"error": "Permission denied"}, status=401)
+
+        data = parseJSON(request.body)
+        try:
+            article.topic = data["topic"]
+        except KeyError:
+            pass
+        try:
+            article.article_text = data["article_text"]
+        except KeyError:
+            pass
+
+        article.save()
+        return JsonResponse(to_dict(article), status=200)
+
     if request.method == "POST":
         # Create article
         user = request.user
