@@ -6,3 +6,7 @@ lib64
 local/
 pip-selfcheck.json
 *.swp
+*.pyc
+pwp/*.pyc
+pwp/api/*.pyc
+pwp/pwp/*.pyc

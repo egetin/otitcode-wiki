@@ -11,9 +11,15 @@ class Article(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(User)
 
+    def __str__(self):
+        return '%s' % self.topic
+
 class Comment(models.Model):
     comment_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     rule = models.ForeignKey('Article', on_delete=models.CASCADE)
     owner = models.ForeignKey(User)
+
+    def __str__(self):
+        return '%s' % self.comment_text
