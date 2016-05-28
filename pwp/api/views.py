@@ -113,19 +113,19 @@ def ArticleHandler(request, article_id=None):
 
 @require_http_methods(["PUT"])
 def PasswordHandler(request):
-    body = parseJSON(request.body)
-    try:
-        password = body["password"]
-    except (ValueError, KeyError):
-        return JsonResponse({'error': 'JSON is invalid'}, status=409)
+    if request.user is not None:
+        body = parseJSON(request.body)
+        try:
+            password = body["password"]
+        except (ValueError, KeyError):
+            return JsonResponse({'error': 'JSON is invalid'}, status=409)
 
-    user = request.user
-    user.set_password(password)
-    user.save()
-
-    token = Token.objects.create(user=user)
-    response = HttpResponse(jsonresponse)
-    response["Authorization"] = token
+        user = request.user
+        user.set_password(password)
+        user.save()
+        return HttpResponse(status=200)
+    else:
+        return JsonResponse({"error": "User not logged in"}, status=404)
 
 
 @require_http_methods(["GET", "PUT", "DELETE"])
