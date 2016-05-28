@@ -131,7 +131,7 @@ def UserHandler(request, user_id=None):
         user_dict = to_dict(user)
         return JsonResponse(user_dict, status=200)
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def CommentHandler(request, comment_id=None):
     if request.method == "GET" and comment_id is None:
         comments = Comment.objects.all()
@@ -152,6 +152,25 @@ def CommentHandler(request, comment_id=None):
         comment_dict = to_dict(comment)
         return JsonResponse(comment_dict, status=200)
 
+
+@require_http_methods(["GET", "POST"])
+def ArticleCommentHandler(request, article_id=None):
+    if article_id is None:
+        return JsonResponse({"error": "No article was defined."}, status=400)
+
+    if request.method == "GET":
+        try:
+            comments = Comment.objects.filter(article=article_id)
+        except Comment.DoesNotExist:
+            return JsonResponse([], status=200)
+
+        data = []
+        for comment in comments:
+            json_comment = to_dict(comment)
+            data.append(json_comment)
+
+        return JsonResponse(data, safe=False)
+
     if request.method == "POST":
         # Create comment
         user = request.user
@@ -170,20 +189,3 @@ def CommentHandler(request, comment_id=None):
         new_comment.save()
 
         return JsonResponse(to_dict(new_comment))
-
-@require_http_methods(["GET"])
-def ArticleCommentHandler(request, article_id=None):
-    if article_id is None:
-        return JsonResponse({"error": "No article was defined."}, status=400)
-
-    try:
-        comments = Comment.objects.filter(article=article_id)
-    except Comment.DoesNotExist:
-        return JsonResponse([], status=200)
-
-    data = []
-    for comment in comments:
-        json_comment = to_dict(comment)
-        data.append(json_comment)
-
-    return JsonResponse(data, safe=False)
