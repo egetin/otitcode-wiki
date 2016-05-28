@@ -161,6 +161,10 @@ def CurrentUserHandler(request):
 
         return HttpResponse(status=200)
 
+    if request.method == 'DELETE':
+        request.user.delete()
+        return HttpResponse(status=200)
+
 @require_http_methods(["GET", "PUT", "POST", "DELETE"])
 def UserHandler(request, user_id=None):
     if request.method == 'GET' and user_id is None:
