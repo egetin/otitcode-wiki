@@ -32,16 +32,15 @@ def AuthHandler(request):
             response["Authorization"] = token
             return response
         else:
-            return JsonResponse({"error": "Invalid credentials!"}, status_code=401)
+            return JsonResponse({"error": "Invalid credentials!"}, status=401)
 
     if request.method == "DELETE":
         if request.user is not None:
             Token.objects.get(user=request.user).delete()
             response = HttpResponse(status=204)
-            response["Authorization"] = ""
             return response
         else:
-            return JsonResponse({"error": "Invalid authentication token"}, status_code=401)
+            return JsonResponse({"error": "Invalid authentication token"}, status=401)
 
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def ArticleHandler(request, article_id=None):
