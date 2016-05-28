@@ -219,3 +219,39 @@ def ArticleCommentHandler(request, article_id=None):
         new_comment.save()
 
         return JsonResponse(to_dict(new_comment))
+
+@require_http_methods(["GET"])
+def UserCommentHandler(request, user_id=None):
+    if user_id is None:
+        return JsonResponse({"error": "No user was defined."}, status=400)
+
+    if request.method == "GET":
+        try:
+            comments = Comment.objects.filter(owner=user_id)
+        except Comment.DoesNotExist:
+            return JsonResponse([], status=200)
+
+        data = []
+        for comment in comments:
+            json_comment = to_dict(comment)
+            data.append(json_comment)
+
+        return JsonResponse(data, safe=False)
+
+@require_http_methods(["GET"])
+def UserArticleHandler(request, user_id=None):
+    if user_id is None:
+        return JsonResponse({"error": "No user was defined."}, status=400)
+
+    if request.method == "GET":
+        try:
+            articles = Article.objects.filter(owner=user_id)
+        except Article.DoesNotExist:
+            return JsonResponse([], status=200)
+
+        data = []
+        for article in articles:
+            json_article = to_dict(article)
+            data.append(json_article)
+
+        return JsonResponse(data, safe=False)
