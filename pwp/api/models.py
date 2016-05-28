@@ -8,12 +8,14 @@ class Article(models.Model):
     article_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey('User')
 
 class Comment(models.Model):
     comment_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     rule = models.ForeignKey('Article', on_delete=models.CASCADE)
+    user = models.ForeignKey('User')
 
 class User(models.Model):
     nickname = models.CharField(max_length=30)
