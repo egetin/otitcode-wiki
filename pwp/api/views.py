@@ -137,14 +137,30 @@ def PasswordHandler(request):
 
 @require_http_methods(["GET", "PUT", "DELETE"])
 def CurrentUserHandler(request):
-    if request.method == 'GET':
-        if request.user is not None:
-            user_dict = to_dict(request.user)
-            user_dict.pop("password", None)
-            return JsonResponse(user_dict)
-        else:
-            return JsonResponse({"error": "User not logged in"}, status=404)
+    if request.user is None:
+        return JsonResponse({"error": "User not logged in"}, status=404)
 
+    if request.method == 'GET':
+        user_dict = to_dict(request.user)
+        user_dict.pop("password", None)
+        return JsonResponse(user_dict)
+
+    if request.method == 'PUT':
+        body = parseJSON(request.body)
+        try:
+            first_name = body["first_name"]
+            last_name = body["last_name"]
+            email = body["email"]
+        except (ValueError, KeyError):
+            return JsonResponse({'error': 'JSON is invalid'}, status=409)
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        return HttpResponse(status=200)
 
 @require_http_methods(["GET", "PUT", "POST", "DELETE"])
 def UserHandler(request, user_id=None):
