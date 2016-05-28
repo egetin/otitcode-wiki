@@ -9,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from rest_framework.authtoken.models import Token
 from models import Article, Comment
 from utils import parseJSON, serialize_json, to_dict
+from django.db import IntegrityError
 
 # Create your views here.
 @require_http_methods(["POST"])
@@ -130,6 +131,35 @@ def UserHandler(request, user_id=None):
 
         user_dict = to_dict(user)
         return JsonResponse(user_dict, status=200)
+
+    if request.method == "POST":
+        body = parseJSON(request.body)
+        try:
+            username = body["username"]
+            password = body["password"]
+        except (ValueError, KeyError):
+            return JsonResponse({'error': 'JSON is invalid'}, status=409)
+
+        try:
+            user = User.objects.create_user(username, None, password)
+            user.save()
+        except IntegrityError:
+            return JsonResponse({'error': 'Username already taken'}, status=409)
+
+        token = Token.objects.get(user=user)
+        if token is None:
+            token = Token.objects.create(user=user)
+        jsonresponse = {
+            "username": user.username,
+            "firstname": user.first_name,
+            "lastname": user.last_name,
+            "email": user.email
+        }
+
+        response = JsonResponse(jsonresponse)
+        response["Authorization"] = token
+
+        return response
 
 @require_http_methods(["GET", "POST"])
 def CommentHandler(request, comment_id=None):
