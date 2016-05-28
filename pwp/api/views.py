@@ -12,29 +12,36 @@ from utils import parseJSON, serialize_json, to_dict
 from django.db import IntegrityError
 
 # Create your views here.
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "DELETE"])
 def AuthHandler(request):
-    body = parseJSON(request.body)
-    user = authenticate(username=body["username"], password=body["password"])
-    if user is not None:
-        token = Token.objects.get(user=user)
-        if token is None:
-            token = Token.objects.create(user=user)
-        jsonresponse = {
-            "username": user.username,
-            "firstname": user.first_name,
-            "lastname": user.last_name,
-            "email": user.email
-        }
-        response = JsonResponse(jsonresponse)
-        response["Authorization"] = token
-        return response
-    else:
-        return JsonResponse({"error": "Invalid credentials!"}, status_code=401)
+    if request.method == "POST":
+        body = parseJSON(request.body)
+        user = authenticate(username=body["username"], password=body["password"])
+        if user is not None:
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+            jsonresponse = {
+                "username": user.username,
+                "firstname": user.first_name,
+                "lastname": user.last_name,
+                "email": user.email
+            }
+            response = JsonResponse(jsonresponse)
+            response["Authorization"] = token
+            return response
+        else:
+            return JsonResponse({"error": "Invalid credentials!"}, status_code=401)
 
-def index(request):
-    response = HttpResponse("Hello World!")
-    return response
+    if request.method == "DELETE":
+        if request.user is not None:
+            Token.objects.get(user=request.user).delete()
+            response = HttpResponse(status=204)
+            response["Authorization"] = ""
+            return response
+        else:
+            return JsonResponse({"error": "Invalid authentication token"}, status_code=401)
 
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def ArticleHandler(request, article_id=None):
