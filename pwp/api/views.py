@@ -165,7 +165,7 @@ def CurrentUserHandler(request):
         request.user.delete()
         return HttpResponse(status=200)
 
-@require_http_methods(["GET", "PUT", "POST", "DELETE"])
+@require_http_methods(["GET", "POST"])
 def UserHandler(request, user_id=None):
     if request.method == 'GET' and user_id is None:
         users = User.objects.all()
@@ -185,6 +185,7 @@ def UserHandler(request, user_id=None):
             return JsonResponse({"error": "User does not exist"}, status=404)
 
         user_dict = to_dict(user)
+        user_dict.pop("password", None)
         return JsonResponse(user_dict, status=200)
 
     if request.method == "POST":
@@ -215,8 +216,6 @@ def UserHandler(request, user_id=None):
         response["Authorization"] = token
 
         return response
-
-
 
 @require_http_methods(["GET"])
 def CommentHandler(request, comment_id=None):
