@@ -110,6 +110,34 @@ def ArticleHandler(request, article_id=None):
         else:
             return JsonResponse({"error": "Permission denied"}, status=401)
 
+
+@require_http_methods(["PUT"])
+def PasswordHandler(request):
+    body = parseJSON(request.body)
+    try:
+        password = body["password"]
+    except (ValueError, KeyError):
+        return JsonResponse({'error': 'JSON is invalid'}, status=409)
+
+    user = request.user
+    user.set_password(password)
+    user.save()
+
+    token = Token.objects.create(user=user)
+    response = HttpResponse(jsonresponse)
+    response["Authorization"] = token
+
+
+@require_http_methods(["GET", "PUT", "DELETE"])
+def CurrentUserHandler(request):
+    if request.method == 'GET':
+        if request.user is not None:
+            user_dict = to_dict(request.user)
+            return JsonResponse(user_dict)
+        else:
+            return JsonResponse({"error": "User not logged in"}, status=404)
+
+
 @require_http_methods(["GET", "PUT", "POST", "DELETE"])
 def UserHandler(request, user_id=None):
     if request.method == 'GET' and user_id is None:
@@ -160,6 +188,8 @@ def UserHandler(request, user_id=None):
         response["Authorization"] = token
 
         return response
+
+
 
 @require_http_methods(["GET"])
 def CommentHandler(request, comment_id=None):
@@ -220,3 +250,39 @@ def ArticleCommentHandler(request, article_id=None):
         new_comment.save()
 
         return JsonResponse(to_dict(new_comment))
+
+@require_http_methods(["GET"])
+def UserCommentHandler(request, user_id=None):
+    if user_id is None:
+        return JsonResponse({"error": "No user was defined."}, status=400)
+
+    if request.method == "GET":
+        try:
+            comments = Comment.objects.filter(owner=user_id)
+        except Comment.DoesNotExist:
+            return JsonResponse([], status=200)
+
+        data = []
+        for comment in comments:
+            json_comment = to_dict(comment)
+            data.append(json_comment)
+
+        return JsonResponse(data, safe=False)
+
+@require_http_methods(["GET"])
+def UserArticleHandler(request, user_id=None):
+    if user_id is None:
+        return JsonResponse({"error": "No user was defined."}, status=400)
+
+    if request.method == "GET":
+        try:
+            articles = Article.objects.filter(owner=user_id)
+        except Article.DoesNotExist:
+            return JsonResponse([], status=200)
+
+        data = []
+        for article in articles:
+            json_article = to_dict(article)
+            data.append(json_article)
+
+        return JsonResponse(data, safe=False)
