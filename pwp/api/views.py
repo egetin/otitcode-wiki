@@ -215,7 +215,7 @@ def ArticleCommentHandler(request, article_id=None):
 
         new_comment = serializers.deserialize('json', serialized_data).next().object
         new_comment.owner = request.user
-        new_comment.article = article_id
+        new_comment.article = Article.objects.get(pk=article_id)
 
         new_comment.save()
 
