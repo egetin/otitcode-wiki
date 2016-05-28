@@ -9,6 +9,8 @@ urlpatterns = [
     url(r'^articles/(?P<article_id>\d+)/comments$', views.ArticleCommentHandler, name='articlecomment'),
     url(r'^comments$', views.CommentHandler, name='comments'),
     url(r'^comments/(?P<comment_id>\d+)$', views.CommentHandler, name='comments'),
+    url(r'^users$', views.UserHandler, name='users'),
+    url(r'^users/(?P<user_id>\d+)$', views.UserHandler, name='user'),
     #users
     #users id
 # users id comments

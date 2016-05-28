@@ -4,6 +4,7 @@ from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from rest_framework.authtoken.models import Token
 from models import Article, Comment
@@ -110,7 +111,25 @@ def ArticleHandler(request, article_id=None):
 
 @require_http_methods(["GET", "PUT", "POST", "DELETE"])
 def UserHandler(request, user_id=None):
-    pass
+    if request.method == 'GET' and user_id is None:
+        users = User.objects.all()
+        data = []
+
+        for user in users:
+            user_dict = to_dict(user)
+            user_dict.pop("password", None)
+            data.append(user_dict)
+
+        return JsonResponse(data, safe=False)
+
+    if request.method == 'GET' and user_id is not None:
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=404)
+
+        user_dict = to_dict(user)
+        return JsonResponse(user_dict, status=200)
 
 @require_http_methods(["GET", "POST"])
 def CommentHandler(request, comment_id=None):
