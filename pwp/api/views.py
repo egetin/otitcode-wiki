@@ -49,12 +49,11 @@ def ArticlesHandler(request):
 
     return JsonResponse(data, safe=False)
 
-@require_http_methods(["GET", "POST", "PUT"])
-def ArticleHandler(request):
+@require_http_methods(["GET", "POST", "PUT", "DELETE"])
+def ArticleHandler(request, article_id=None):
     if request.method == "POST":
         # Create article
         user = request.user
-        print user
         if user is None:
             return JsonResponse({"error": "User not authenticated"}, status=401)
 
@@ -70,4 +69,16 @@ def ArticleHandler(request):
         new_article.save()
 
         return JsonResponse(model_to_dict(new_article))
+
+    if request.method == "DELETE" and article_id is not None:
+        try:
+            article = Article.objects.get(pk=article_id)
+        except Article.DoesNotExist:
+            return JsonResponse({"error": "Article does not exist"}, status=404)
+
+        if article.owner == request.user:
+            article.delete()
+            return HttpResponse(status=204)
+        else:
+            return JsonResponse({"error": "Permission denied"}, status=401)
 
