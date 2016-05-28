@@ -1,4 +1,5 @@
 from rest_framework.authtoken.models import Token
+import re
 
 class AuthTokenMiddleware(object):
     def process_request(self, request):
@@ -13,5 +14,7 @@ class AuthTokenMiddleware(object):
                 request.auth = None
                 pass
         else:
-            request.user = None
-            request.auth = None
+            regex = re.compile('^(?!/admin)/')
+            if regex.match(request.path):
+                request.user = None
+                request.auth = None

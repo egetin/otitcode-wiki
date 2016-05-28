@@ -199,7 +199,7 @@ def CommentHandler(request, comment_id=None):
 
         for comment in comments:
             comment_dict = to_dict(comment)
-            data.append(article_dict)
+            data.append(comment_dict)
 
         return JsonResponse(data, safe=False)
 
