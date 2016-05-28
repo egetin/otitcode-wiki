@@ -25,8 +25,8 @@ def AuthHandler(request):
             "lastname": user.last_name,
             "email": user.email
         }
-        response = HttpResponse()
-        response["Authentication"] = token
+        response = JsonResponse(jsonresponse)
+        response["Authorization"] = token
         return response
     else:
         return JsonResponse({"error": "Invalid credentials!"}, status_code=401)
