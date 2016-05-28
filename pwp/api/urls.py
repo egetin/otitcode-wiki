@@ -3,4 +3,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^articles/$', views.GetArticles, name='GetArticles'),
 ]
