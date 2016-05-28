@@ -5,10 +5,9 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser
 from django.views.decorators.http import require_http_methods
-from django.forms.models import model_to_dict
 from rest_framework.authtoken.models import Token
 from models import Article, Comment
-from utils import parseJSON, serialize_json
+from utils import parseJSON, serialize_json, to_dict
 
 # Create your views here.
 @require_http_methods(["POST"])
@@ -35,22 +34,27 @@ def index(request):
     response = HttpResponse("Hello World!")
     return response
 
-@require_http_methods(["GET"])
-def ArticlesHandler(request):
-    user = request.user
-    print user
-
-    articles = Article.objects.all()
-    data = []
-
-    for article in articles:
-        article_dict = model_to_dict(article)
-        data.append(article_dict)
-
-    return JsonResponse(data, safe=False)
-
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def ArticleHandler(request, article_id=None):
+    if request.method == "GET" and article_id is None:
+        articles = Article.objects.all()
+        data = []
+
+        for article in articles:
+            article_dict = to_dict(article)
+            data.append(article_dict)
+
+        return JsonResponse(data, safe=False)
+
+    if request.method == "GET" and article_id is not None:
+        try:
+            article = Article.objects.get(pk=article_id)
+        except Article.DoesNotExist:
+            return JsonResponse({"error": "Article does not exist"}, status=404)
+
+        article_dict = to_dict(article)
+        return JsonResponse(article_dict, status=200)
+
     if request.method == "POST":
         # Create article
         user = request.user
@@ -68,7 +72,7 @@ def ArticleHandler(request, article_id=None):
 
         new_article.save()
 
-        return JsonResponse(model_to_dict(new_article))
+        return JsonResponse(to_dict(new_article))
 
     if request.method == "DELETE" and article_id is not None:
         try:
