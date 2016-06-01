@@ -1,3 +1,4 @@
+*.png
 *.pyc
 pwp/*.pyc
 pwp/api/*.pyc

@@ -1,9 +1,20 @@
 # #otit.code rule wiki backend
 
+
 ## Developers
  - Erkka Makinen
  - Henri Koski
  - Mikko Korhonen
+
+## Technology stack
+ - Django
+ - argparse
+ - django-extensions
+ - djangorestframework
+ - psycopg2
+ - six
+ - wsgiref
+ - PostgreSQL
 
 ## Development requirements & installation
 ### Requirements
